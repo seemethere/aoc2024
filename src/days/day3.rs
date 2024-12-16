@@ -33,14 +33,17 @@ fn part_two(input: String) -> i32 {
     let mut result = 0;
     let mut enabled = true;
     for cap in FULL_PATTERN.captures_iter(&input) {
-        if let Some(mult) = cap.name("mult") {
-            if enabled {
-                result += part_one(mult.as_str().to_string());
+        match cap {
+            c if c.name("dont").is_some() => {
+                enabled = false;
             }
-        } else if let Some(_) = cap.name("dont") {
-            enabled = false;
-        } else if let Some(_) = cap.name("do") {
-            enabled = true;
+            c if c.name("do").is_some() => {
+                enabled = true;
+            }
+            c if c.name("mult").is_some() && enabled => {
+                result += part_one(c.name("mult").unwrap().as_str().to_string());
+            }
+            _ => {}
         }
     }
     return result;
