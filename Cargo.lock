@@ -68,6 +68,7 @@ dependencies = [
  "env_logger",
  "itertools",
  "log",
+ "regex",
 ]
 
 [[package]]
