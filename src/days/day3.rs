@@ -1,5 +1,6 @@
 use clap::Args;
 use log::info;
+use once_cell::sync::Lazy;
 use regex::Regex;
 use std::fs::{self};
 use std::io::{self};
@@ -15,9 +16,9 @@ fn read_input_file(path: &str) -> Result<String, io::Error> {
 }
 
 fn part_one(input: String) -> i32 {
-    let mult_pattern = Regex::new(r"mul\((\d+),(\d+)\)").unwrap();
+    static MULT_PATTERN: Lazy<Regex> = Lazy::new(|| Regex::new(r"mul\((\d+),(\d+)\)").unwrap());
     let mut result = 0;
-    for cap in mult_pattern.captures_iter(&input) {
+    for cap in MULT_PATTERN.captures_iter(&input) {
         let a = cap[1].parse::<i32>().unwrap();
         let b = cap[2].parse::<i32>().unwrap();
         result += a * b;
@@ -26,11 +27,12 @@ fn part_one(input: String) -> i32 {
 }
 
 fn part_two(input: String) -> i32 {
-    let mult_pattern =
-        Regex::new(r"(?P<mult>mul\(\d+,\d+\))|(?P<dont>don't\(\))|(?P<do>do\(\))").unwrap();
+    static FULL_PATTERN: Lazy<Regex> = Lazy::new(|| {
+        Regex::new(r"(?P<mult>mul\(\d+,\d+\))|(?P<dont>don't\(\))|(?P<do>do\(\))").unwrap()
+    });
     let mut result = 0;
     let mut enabled = true;
-    for cap in mult_pattern.captures_iter(&input) {
+    for cap in FULL_PATTERN.captures_iter(&input) {
         if let Some(mult) = cap.name("mult") {
             if enabled {
                 result += part_one(mult.as_str().to_string());
